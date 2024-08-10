@@ -1,6 +1,5 @@
 import javax.xml.transform.Source;
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.*;
 import java.util.Scanner;
 
 public class Student {
@@ -24,6 +23,10 @@ public class Student {
         Student.connection();
         Scanner scan = new Scanner(System.in);
         int option;
+        String name;
+        String gender;
+        float score1,score2,score3,total,average;
+        char grade;
         do {
             System.out.println("1. Insert Data");
             System.out.println("2. Select Data");
@@ -37,7 +40,96 @@ public class Student {
             option = scan.nextInt();
             switch (option){
                 case 1->{
-
+                    int n;
+                    System.out.println("------- Insert Data -------");
+                    System.out.print("Enter Number of Student: ");
+                    n = scan.nextInt();
+                    for (int i = 0;i < n;i++){
+                        System.out.println("---- Student #" + (i+1)+ "------");
+                        System.out.print("Enter Name: ");
+                        scan.nextLine();
+                        name = scan.nextLine();
+                        System.out.print("Enter Gender: ");
+                        gender = scan.nextLine();
+                        System.out.print("Enter Score1: ");
+                        score1 = scan.nextFloat();
+                        System.out.print("Enter Score2: ");
+                        score2 = scan.nextFloat();
+                        System.out.print("Enter Score3: ");
+                        score3 = scan.nextFloat();
+                        total = score1+score2+score3;
+                        average = total / 3;
+                        grade = (average>=90)?'A' :
+                                (average>=80)?'B':
+                                        (average>=70)?'C':
+                                                (average>=60)?'D':
+                                                        (average>=50)?'E':'F';
+                        String sql = "INSERT INTO `students`(`name`, `gender`, `score1`, `score2`, `score3`, `total`, `average`, `grade`) values(?,?,?,?,?,?,?,?)";
+                        try {
+                            Connection con = connection();
+                            PreparedStatement ps = con.prepareStatement(sql);
+                            ps.setString(1, name);
+                            ps.setString(2,gender);
+                            ps.setFloat(3, score1);
+                            ps.setFloat(4, score2);
+                            ps.setFloat(5, score3);
+                            ps.setFloat(6, total);
+                            ps.setFloat(7, average);
+                            ps.setString(8,grade+"");
+                            ps.executeUpdate();
+                        }
+                        catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                    System.out.println("Insert Successfully");
+                }
+                case 2->{
+                    System.out.println("------ SELECT -------");
+                    try{
+                        Connection con = connection();
+                        String sql = "SELECT * FROM students";//sql
+                        Statement st = con.createStatement();// create statement to execute sql
+                        ResultSet rs = st.executeQuery(sql);// execute sql
+                        while(rs.next()){// get all data from result set
+                            System.out.println("ID = "+rs.getInt("id"));
+                            System.out.println("Name = "+rs.getString("name"));
+                            System.out.println("Gender = "+rs.getString("gender"));
+                            System.out.println("Score1 = "+rs.getFloat("score1"));
+                            System.out.println("Score2 = "+rs.getFloat("score2"));
+                            System.out.println("Score3 = "+rs.getFloat("score3"));
+                            System.out.println("Total = "+rs.getFloat("total"));
+                            System.out.println("Average = "+rs.getFloat("average"));
+                            System.out.println("Grade = "+rs.getString("grade"));
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+                case 3->{
+                    System.out.println("------ SEARCH by ID -------");
+                    System.out.print("Enter id to search: ");
+                    int id = scan.nextInt();
+                    String sql = "SELECT * FROM students WHERE id = " + id;
+                    try {
+                        Connection con = connection();
+                        Statement st = con.createStatement();
+                        ResultSet rs = st.executeQuery(sql);
+                        while(rs.next()){
+                            System.out.println("ID = "+rs.getInt("id"));
+                            System.out.println("Name = "+rs.getString("name"));
+                            System.out.println("Gender = "+rs.getString("gender"));
+                            System.out.println("Score1 = "+rs.getFloat("score1"));
+                            System.out.println("Score2 = "+rs.getFloat("score2"));
+                            System.out.println("Score3 = "+rs.getFloat("score3"));
+                            System.out.println("Total = "+rs.getFloat("total"));
+                            System.out.println("Average = "+rs.getFloat("average"));
+                            System.out.println("Grade = "+rs.getString("grade"));
+                        }
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
             }
         }while (true);
